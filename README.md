@@ -1,3 +1,3 @@
 # Zoom
 
-> Zoom clone using Node.js, WebRTC and Wesockets.
+> Zoom clone using Node.js, WebRTC and Websockets.
