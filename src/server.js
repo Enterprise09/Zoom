@@ -20,10 +20,21 @@ const wss = new WebSocket.Server({ server });
 
 wss.on("connection", (socket) => {
   console.log("Connected to Browser");
+  socket["nickname"] = "Anknown";
   sockets.push(socket);
   socket.on("close", () => console.log("Disconnect from the Browser"));
-  socket.on("message", (message) => {
-    sockets.forEach((aSocket) => aSocket.send(message.toString()));
+  socket.on("message", (msg) => {
+    const message = JSON.parse(msg.toString());
+    switch (message.type) {
+      case "new_message":
+        sockets.forEach((aSocket) =>
+          aSocket.send(`${socket.nickname} : ${message.payload}`)
+        );
+        break;
+      case "nickname":
+        socket["nickname"] = message.payload;
+        break;
+    }
   });
 });
 
