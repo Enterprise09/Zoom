@@ -13,23 +13,27 @@ app.get("/", (req, res) => res.render("home"));
 app.get("/*", (req, res) => res.redirect("/"));
 
 io.on("connection", (socket) => {
+  socket["nickname"] = "Anknown";
   socket.onAny((event) => {
     console.log(`Socket Event: ${event}`);
   });
   console.log(socket);
-  socket.on("enter_room", (roomName, done) => {
+  socket.on("enter_room", (roomName, nickname, done) => {
+    socket["nickname"] = nickname;
     socket.join(roomName);
     console.log(socket.rooms);
     done();
-    socket.to(roomName).emit("welcome"); //왜 방을 만들 때는 실행이 안되는지?
+    socket.to(roomName).emit("welcome", socket.nickname); //왜 방을 만들 때는 실행이 안되는지?
   });
 
   socket.on("disconnecting", () => {
-    socket.rooms.forEach((room) => socket.to(room).emit("bye"));
+    socket.rooms.forEach((room) =>
+      socket.to(room).emit("bye", socket.nickname)
+    );
   });
 
   socket.on("new_message", (msg, room, done) => {
-    socket.to(room).emit("new_message", msg);
+    socket.to(room).emit("new_message", `${socket.nickname} : ${msg}`);
     done();
   });
 });
