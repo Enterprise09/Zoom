@@ -19,6 +19,17 @@ io.on("connection", (socket) => {
   console.log(socket);
   socket.on("enter_room", (roomName, done) => {
     socket.join(roomName);
+    console.log(socket.rooms);
+    done();
+    socket.to(roomName).emit("welcome"); //왜 방을 만들 때는 실행이 안되는지?
+  });
+
+  socket.on("disconnecting", () => {
+    socket.rooms.forEach((room) => socket.to(room).emit("bye"));
+  });
+
+  socket.on("new_message", (msg, room, done) => {
+    socket.to(room).emit("new_message", msg);
     done();
   });
 });
