@@ -19,6 +19,7 @@ function publicRooms() {
     },
   } = io;
   const publicRooms = [];
+  console.log(rooms);
   rooms.forEach((_, key) => {
     if (sids.get(key) === undefined) {
       publicRooms.push(key);
@@ -27,24 +28,28 @@ function publicRooms() {
   return publicRooms;
 }
 
+function countRoom(roomName) {
+  return io.sockets.adapter.rooms.get(roomName)?.size;
+}
+
 io.on("connection", (socket) => {
   socket["nickname"] = "Anknown";
   socket.onAny((event) => {
+    console.log(socket.rooms);
     console.log(`Socket Event: ${event}`);
   });
   // console.log(socket);
   socket.on("enter_room", (roomName, nickname, done) => {
     socket["nickname"] = nickname;
     socket.join(roomName);
-    console.log(socket.rooms);
     done();
-    socket.to(roomName).emit("welcome", socket.nickname); //왜 방을 만들 때는 실행이 안되는지?
+    socket.to(roomName).emit("welcome", socket.nickname, countRoom(roomName)); //왜 방을 만들 때는 실행이 안되는지?
     io.sockets.emit("room_change", publicRooms());
   });
 
   socket.on("disconnecting", () => {
     socket.rooms.forEach((room) =>
-      socket.to(room).emit("bye", socket.nickname)
+      socket.to(room).emit("bye", socket.nickname, countRoom(room) - 1)
     );
   });
 
