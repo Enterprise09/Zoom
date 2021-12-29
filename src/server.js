@@ -1,10 +1,17 @@
 import express from "express";
-import SocketIo from "socket.io";
+import { Server } from "socket.io";
+import { instrument } from "@socket.io/admin-ui";
 import http from "http";
 
 const app = express();
 const httpServer = http.createServer(app);
-const io = SocketIo(httpServer);
+const io = new Server(httpServer, {
+  cors: {
+    origin: ["https://admin.socket.io"],
+    credentials: true,
+  },
+});
+instrument(io, { auth: false });
 
 app.set("view engine", "pug");
 app.set("views", __dirname + "/views");
