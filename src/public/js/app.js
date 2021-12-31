@@ -5,17 +5,21 @@ const cameraBtn = document.getElementById("camera");
 const camerasSelect = document.getElementById("cameras");
 
 let myStream;
-let muted = false;
+let isMuted = false;
 let cameraOff = false;
 
 async function getCameras() {
   try {
     const devices = await navigator.mediaDevices.enumerateDevices();
     const cameras = devices.filter((device) => device.kind === "videoinput");
+    const currnetCamera = myStream.getVideoTracks()[0];
     cameras.forEach((camera) => {
       const option = document.createElement("option");
       option.value = camera.deviceId;
       option.innerText = camera.label;
+      if (currnetCamera.label == camera.label) {
+        option.selected = true;
+      }
       camerasSelect.appendChild(option);
     });
   } catch (e) {
@@ -23,30 +27,41 @@ async function getCameras() {
   }
 }
 
-async function getMedia() {
+async function getMedia(deviceId) {
+  const initialConstraints = {
+    audio: !isMuted,
+    video: { facingMode: "user" },
+  };
+  const cameraConstrains = {
+    audio: !isMuted,
+    video: { deviceId: { exact: deviceId } },
+  };
   try {
-    myStream = await navigator.mediaDevices.getUserMedia({
-      audio: true,
-      video: true,
-    });
+    myStream = await navigator.mediaDevices.getUserMedia(
+      deviceId ? cameraConstrains : initialConstraints
+    );
     myFace.srcObject = myStream;
-    await getCameras();
+    if (!deviceId) {
+      await getCameras();
+    }
   } catch (e) {
     console.log(e.message);
   }
 }
 
-function handleMuteClick() {
+async function handleMuteClick() {
   myStream
     .getAudioTracks()
     .forEach((track) => (track.enabled = !track.enabled));
-  if (!muted) {
-    muteBtn.innerText = "Unmute";
-    muted = true;
-  } else {
+  if (isMuted) {
+    // 현재 Mute 상태
     muteBtn.innerText = "mute";
-    muted = false;
+    isMuted = false;
+  } else {
+    muteBtn.innerText = "Unmute";
+    isMuted = true;
   }
+  await getMedia(camerasSelect.value);
 }
 
 function handleCameraClick() {
@@ -62,8 +77,14 @@ function handleCameraClick() {
   }
 }
 
+async function handleCameraChange() {
+  await getMedia(camerasSelect.value);
+}
+
 muteBtn.addEventListener("click", handleMuteClick);
 
 cameraBtn.addEventListener("click", handleCameraClick);
+
+camerasSelect.addEventListener("input", handleCameraChange);
 
 getMedia();
