@@ -1,7 +1,9 @@
 # Zoom
 
-<img src="https://img.shields.io/badge/Node.js-14.15.1-brightgreen">
-<img src="https://img.shields.io/badge/Develop-~ing-orange">
+<div>
+    <img src="https://img.shields.io/badge/Node.js-14.15.1-brightgreen">
+    <img src="https://img.shields.io/badge/Develop-~ing-orange">
+</div>
 
 > simple Zoom clone using Node.js, WebRTC and Websockets.
 
