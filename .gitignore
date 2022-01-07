@@ -1,3 +1,7 @@
 /node_modules
 package-lock.json
 yarn.lock
+
+# firebase config file
+/src/config/zoom-firebase-adminsdk.json
+/src/db/firebaseService.js
