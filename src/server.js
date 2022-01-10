@@ -44,7 +44,7 @@ app.post("/login", async (req, res) => {
         } = user;
         console.log(`Sign In : ${uid}, ${email}, ${displayName}`);
         res.send({
-          status: 200,
+          userObj: user.user,
         });
       })
       .catch((err) => {
@@ -70,7 +70,7 @@ app.post("/register", async (req, res) => {
         } = user;
         console.log(`Register : ${uid}, ${email}, ${displayName}`);
         res.send({
-          status: 200,
+          userObj: user.user,
         });
       })
       .catch((err) => {
